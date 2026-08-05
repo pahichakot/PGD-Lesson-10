@@ -19,21 +19,21 @@ def change_background(image):
 #Classes
 class Bin(pygame.sprite.Sprite):
     def __init__ (self):
-        super().__init__(self)
+        super().__init__()
         self.image = pygame.image.load("bin.png")
         self.image = pygame.transform.scale(self.image, (40, 60))
         self.rect = self.image.get_rect()
 
 class Non_recyclable(pygame.sprite.Sprite):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
         self.image = pygame.image.load("plastic.png")
         self.image = pygame.transform.scale(self.image, (40,40))
         self.rect = self.image.get_rect()
 
 class Recyclable(pygame.sprite.Sprite):
     def __init__(self, image):
-        super().__init__(self)
+        super().__init__()
         self.image = pygame.image.load(image)
         self.image = pygame.transform.scale(self.image, (30,30))
         self.rect = self.image.get_rect()
@@ -89,6 +89,7 @@ while playing:
 
     total_time = time.time() - start_time
 
+    #Win or lose
     if total_time >= 60:
         if score >= 20:
             screen.fill(GREEN)
@@ -104,3 +105,42 @@ while playing:
         change_background("bground.png")
         countdown = myFont.render("Time Left: " + str(60 - int(total_time)), True, BLACK)
         screen.blit(countdown, (20, 20))
+
+        #Control bin
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            if bin.rect.y > 0:
+                bin.rect.y -= 5
+
+        if keys[pygame.K_DOWN]:
+            if bin.rect.y < 630:
+                bin.rect.y += 5
+
+        if keys[pygame.K_RIGHT]:
+            if bin.rect.x < 850:
+                bin.rect.x += 5
+
+        if keys[pygame.K_LEFT]:
+            if bin.rect.x > 0:
+                bin.rect.x -= 5
+
+        #If bin hits recyclable items
+        item_hit_list = pygame.sprite.spritecollide(bin, item_list, True)
+
+        for item in item_hit_list:
+            score += 1
+            text = myFont.render("Score = "+ str(score), True, BLACK)
+
+        #If bin hits recyclable items
+        plastic_hit_list = pygame.sprite.spritecollide(bin, plastic_list, True)
+
+        for plastic in plastic_hit_list:
+            score = score - 5
+            text = myFont.render("Score = "+ str(score), True, BLACK)
+
+    screen.blit(text, (20,50))
+
+    allsprites.draw(screen)
+    pygame.display.update()
+
+pygame.quit()
